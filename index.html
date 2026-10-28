@@ -5,16 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Соня, с 16-летием! 🎂</title>
   <style>
+    /* ========== ПЕРЕМЕННЫЕ ========== */
     :root {
-      --bg: #f8f9fa;
-      --text: #2d3748;
+      --bg-light: #f8f9fa;
+      --text-dark: #2d3748;
       --accent: #e53e3e;
       --accent-soft: rgba(229, 62, 62, 0.15);
       --secondary: #718096;
+      --border-inset: #e2e8f0;
       --card-bg: #ffffff;
-      --border: #e2e8f0;
-      --gold: #d69e2e;
+      --shadow-card: 0 20px 40px rgba(0, 0, 0, 0.1);
       --ease: cubic-bezier(0.4, 0, 0.2, 1);
+      --gold: #d69e2e;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -24,148 +26,158 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background-color: var(--bg);
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      color: var(--text);
-      line-height: 1.6;
-      padding: 15px;
-      overflow-x: hidden;
+      background-color: var(--bg-light);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--text-dark);
+      line-height: 1.7;
+      padding: 1.5rem;
       position: relative;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
-    /* Красивый фон */
-    .bg-glow {
-      position: fixed; inset: 0; z-index: 0; pointer-events: none;
-      background: radial-gradient(circle at 50% 50%, rgba(229, 62, 62, 0.05) 0%, transparent 60%);
+    /* ========== ФОН ========== */
+    .bg-rotating-gradient {
+      position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
+      background: conic-gradient(from 0deg, rgba(229, 62, 62, 0.03) 0%, rgba(248, 249, 250, 0.3) 20%, rgba(229, 62, 62, 0.05) 40%, rgba(248, 249, 250, 0.2) 60%, rgba(229, 62, 62, 0.03) 80%, rgba(248, 249, 250, 0.3) 100%);
+      animation: rotateGradient 20s linear infinite; z-index: 0; pointer-events: none;
     }
-    .bg-bokeh {
-      position: fixed; border-radius: 50%; filter: blur(80px); pointer-events: none; z-index: 0;
-    }
-    .bokeh-1 { width: 300px; height: 300px; background: #fff; top: 0; left: 0; opacity: 0.8; }
-    .bokeh-2 { width: 400px; height: 400px; background: var(--accent-soft); bottom: 0; right: 0; }
+    @keyframes rotateGradient { 100% { transform: rotate(360deg); } }
 
-    /* Счётчик конфет */
+    .bg-bokeh { position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+    .bokeh-1, .bokeh-2 { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.8; }
+    .bokeh-1 { width: 500px; height: 500px; top: 5%; left: 5%; background: white; }
+    .bokeh-2 { width: 600px; height: 600px; bottom: 0%; right: 5%; background: var(--accent-soft); transition: background 1s var(--ease); }
+
+    /* ========== ШАРЫ ========== */
+    .balloons-container { position: fixed; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; }
+    .balloon {
+      position: absolute; bottom: -150px; width: 50px; height: 65px;
+      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; opacity: 0.55;
+      animation: floatUp linear infinite; will-change: transform, opacity;
+    }
+    .balloon::after { content: ''; position: absolute; bottom: -18px; left: 50%; width: 1px; height: 22px; background: rgba(113, 128, 150, 0.4); transform: translateX(-50%); }
+    .balloon::before { content: ''; position: absolute; top: 15%; left: 22%; width: 30%; height: 20%; border-radius: 50%; background: rgba(255, 255, 255, 0.5); transform: rotate(-30deg); }
+    @keyframes floatUp { 0% { transform: translateY(0) translateX(0) rotate(-5deg); opacity: 0; } 10% { opacity: 0.55; } 50% { transform: translateY(-55vh) translateX(25px) rotate(5deg); } 90% { opacity: 0.55; } 100% { transform: translateY(-110vh) translateX(-20px) rotate(-5deg); opacity: 0; } }
+
+    /* ========== СЧЕТЧИК ========== */
     .candy-counter {
-      position: fixed; top: 15px; right: 15px; z-index: 100;
-      display: flex; align-items: center; gap: 8px;
-      padding: 8px 12px; background: rgba(255, 255, 255, 0.95);
-      border-radius: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      font-weight: 700; font-size: 0.9rem;
+      position: fixed; top: 20px; right: 20px; z-index: 500;
+      display: flex; align-items: center; gap: 8px; padding: 8px 16px 8px 12px;
+      background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      border-radius: 40px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(229, 62, 62, 0.15);
+      font-weight: 700; font-size: 1rem; transition: transform 0.3s var(--ease);
     }
-    .candy-shop-btn {
-      background: var(--accent); color: white; border: none;
-      width: 26px; height: 26px; border-radius: 50%; font-size: 0.8rem;
-      display: flex; align-items: center; justify-content: center;
-    }
+    .candy-counter.bump { transform: scale(1.15); }
+    .candy-shop-btn { margin-left: 4px; background: var(--accent); color: white; border: none; width: 28px; height: 28px; border-radius: 50%; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
-    /* Карточка */
+    /* ========== КАРТОЧКА ========== */
     .card {
-      position: relative; z-index: 10; width: 100%; max-width: 400px;
+      position: relative; z-index: 10; width: 100%; max-width: 400px; min-height: 550px;
       background: var(--card-bg); border-radius: 24px;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.08), inset 0 0 0 1px var(--border);
-      padding: 30px 20px; text-align: center;
-      transition: transform 0.4s var(--ease);
+      box-shadow: var(--shadow-card), inset 0 0 0 1px var(--border-inset);
+      padding: 2rem 1.6rem; display: flex; flex-direction: column; align-items: center; text-align: center;
+      transition: transform 0.4s var(--ease), box-shadow 0.4s var(--ease); overflow: hidden; isolation: isolate;
     }
+    .card::before {
+      content: ''; position: absolute; inset: 0; border-radius: 24px;
+      background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.35) 0%, transparent 60%);
+      pointer-events: none; opacity: 0; transition: opacity 0.2s var(--ease); z-index: 1;
+    }
+    .card:hover::before { opacity: 1; }
 
-    h1 { font-size: 2.2rem; font-weight: 800; line-height: 1.15; margin-bottom: 5px; }
+    h1 { font-size: 2.3rem; font-weight: 800; line-height: 1.15; margin-bottom: 0.3rem; position: relative; z-index: 2; }
     .name-highlight { color: var(--accent); }
-    
     .age-badge {
-      display: inline-block; background: linear-gradient(135deg, var(--gold), #f6e05e);
-      color: #744210; font-weight: 700; font-size: 0.8rem;
-      padding: 4px 14px; border-radius: 20px; margin: 5px 0 15px;
+      display: inline-flex; align-items: center; gap: 0.3rem; background: linear-gradient(135deg, var(--gold), #f6e05e);
+      color: #744210; font-weight: 700; font-size: 0.85rem; padding: 0.3rem 0.9rem; border-radius: 30px;
+      margin: 0.4rem auto 1rem; position: relative; z-index: 2; box-shadow: 0 4px 12px rgba(214, 158, 46, 0.3); animation: badgePulse 2.5s infinite;
     }
-    
-    .subtitle { font-size: 0.95rem; color: var(--secondary); margin-bottom: 20px; }
+    @keyframes badgePulse { 50% { transform: scale(1.05); } }
+    .subtitle { font-size: 0.95rem; color: var(--secondary); margin-bottom: 1.5rem; position: relative; z-index: 2; }
 
-    /* Кнопки */
-    .btn-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
+    /* ========== КНОПКИ ========== */
+    .btn-group { display: flex; flex-direction: column; gap: 0.6rem; width: 100%; position: relative; z-index: 2; margin-bottom: 1rem; }
     .btn {
-      width: 100%; padding: 12px; border-radius: 30px; font-size: 0.95rem;
-      font-weight: 700; border: 2px solid transparent; display: flex;
-      align-items: center; justify-content: center; gap: 8px;
-      transition: transform 0.2s, box-shadow 0.2s; outline: none;
+      padding: 0.8rem; border-radius: 60px; font-size: 0.9rem; font-weight: 700; font-family: inherit;
+      display: flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer;
+      transition: all 0.3s var(--ease); outline: none; border: 2px solid transparent;
     }
     .btn:active { transform: scale(0.97); }
-    
     .btn-primary { background: transparent; border-color: var(--accent); color: var(--accent); }
+    .btn-primary:hover { background: var(--accent); color: white; box-shadow: 0 4px 15px var(--accent-soft); }
     .btn-aura { background: linear-gradient(135deg, #805ad5, #d53f8c); color: white; }
     .btn-star { background: linear-gradient(135deg, #3182ce, #63b3ed); color: white; }
     .btn-cake { background: linear-gradient(135deg, #ed8936, #f6e05e); color: white; }
     .btn-shop { background: linear-gradient(135deg, #9f7aea, #ed64a6); color: white; }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
 
-    /* Скрытый блок пожеланий */
-    .wishes-wrap {
-      max-height: 0; overflow: hidden; opacity: 0;
-      transition: max-height 0.5s ease, opacity 0.4s ease;
-      text-align: left;
-    }
-    .wishes-wrap.open { max-height: 800px; opacity: 1; margin-top: 15px; }
-    .wishes-list { list-style: none; font-size: 0.9rem; margin-bottom: 20px; }
-    .wishes-list li { margin-bottom: 10px; padding-left: 20px; position: relative; }
-    .wishes-list li::before { content: '✦'; color: var(--accent); position: absolute; left: 0; }
+    /* ========== ПОЖЕЛАНИЯ ========== */
+    .wishes-wrapper { max-height: 0; overflow: hidden; opacity: 0; transition: all 0.5s var(--ease); width: 100%; z-index: 2; }
+    .wishes-wrapper.open { max-height: 900px; opacity: 1; margin-top: 0.5rem; }
+    .wishes-list { list-style: none; text-align: left; margin-bottom: 1rem; }
+    .wishes-list li { font-size: 0.9rem; margin-bottom: 0.8rem; padding-left: 1.5rem; position: relative; opacity: 0; transform: translateY(10px); transition: all 0.4s ease; }
+    .wishes-list li::before { content: '✦'; color: var(--accent); position: absolute; left: 0; top: 2px; }
+    .wishes-wrapper.open li { opacity: 1; transform: translateY(0); }
+    .wishes-wrapper.open li:nth-child(1) { transition-delay: 0.1s; }
+    .wishes-wrapper.open li:nth-child(2) { transition-delay: 0.2s; }
+    .wishes-wrapper.open li:nth-child(3) { transition-delay: 0.3s; }
+    .wishes-wrapper.open li:nth-child(4) { transition-delay: 0.4s; }
 
-    /* Ввод желания */
-    .wish-box { background: #f7fafc; padding: 12px; border-radius: 16px; border: 1px dashed var(--accent); }
-    .wish-input-group { display: flex; gap: 5px; }
-    .wish-input { flex: 1; padding: 8px 12px; border: 1px solid var(--border); border-radius: 20px; font-size: 0.85rem; outline: none; }
-    .wish-btn { background: var(--accent); color: white; border: none; border-radius: 20px; padding: 0 15px; font-weight: 600; }
+    .wish-box { background: linear-gradient(135deg, rgba(229,62,62,0.04), rgba(214,158,46,0.06)); padding: 0.8rem; border-radius: 16px; border: 1px dashed var(--accent); }
+    .wish-input-group { display: flex; gap: 0.5rem; }
+    .wish-input { flex: 1; padding: 0.6rem 0.9rem; border: 1.5px solid var(--border-inset); border-radius: 30px; font-size: 0.85rem; outline: none; }
+    .wish-send { background: var(--accent); color: white; border: none; border-radius: 30px; padding: 0 1rem; font-weight: 700; cursor: pointer; }
 
-    /* Оверлеи (игры) */
-    .overlay {
-      position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; gap: 10px; padding: 15px;
-      background: #1a202c; color: white; font-family: inherit; overflow-y: auto;
-    }
-    .overlay h2 { font-size: 1.2rem; text-align: center; color: #f6e05e; margin-bottom: 5px; }
-    .overlay-score { font-weight: 700; color: #f6e05e; }
-    
-    .back-btn {
-      margin-top: 10px; background: transparent; border: 2px solid #e53e3e;
-      color: #e53e3e; padding: 10px 20px; border-radius: 30px; font-weight: 600;
-    }
+    /* ========== ПАДАЮЩИЕ ЗВЕЗДЫ ========== */
+    .falling-star { position: fixed; z-index: 400; font-size: 28px; cursor: pointer; filter: drop-shadow(0 0 10px #f6e05e); animation: starFall linear forwards; }
+    @keyframes starFall { 0% { transform: translate(0, -60px) rotate(0deg); opacity: 0; } 10% { opacity: 1; } 100% { transform: translate(var(--drift, 0), 110vh) rotate(360deg); opacity: 0; } }
+
+    /* ========== ОВЕРЛЕИ ========== */
+    .overlay { position: fixed; inset: 0; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 15px; background: #1a202c; color: white; font-family: inherit; overflow-y: auto; }
+    .overlay h2 { font-size: 1.3rem; color: #f6e05e; text-align: center; }
+    .score-board { font-size: 1rem; font-weight: 700; color: #f6e05e; margin-bottom: 5px; }
+    .back-btn { margin-top: 15px; background: transparent; border: 2px solid #e53e3e; color: #e53e3e; padding: 10px 24px; border-radius: 30px; font-weight: 600; font-size: 14px; cursor: pointer; }
 
     /* Специфика Змейки */
-    .dpad { display: grid; grid-template-columns: repeat(3, 50px); grid-template-rows: repeat(3, 50px); gap: 5px; margin-top: 5px; }
-    .dpad button { background: rgba(255,255,255,0.1); border: 2px solid #4a5568; color: #f6e05e; font-size: 20px; border-radius: 10px; }
+    .dpad { display: grid; grid-template-columns: repeat(3, 54px); grid-template-rows: repeat(3, 54px); gap: 6px; margin-top: 10px; user-select: none; }
+    .dpad button { background: rgba(255,255,255,0.08); border: 2px solid rgba(99,179,237,0.4); color: #f6e05e; font-size: 22px; border-radius: 12px; cursor: pointer; }
+    .dpad button:active { background: rgba(246,224,94,0.2); }
     .dpad .empty { visibility: hidden; }
-    
+    canvas { background: #1a202c; border: 2px solid #4a5568; border-radius: 12px; touch-action: none; }
+
     /* Специфика Звезды */
-    .star-field { position: relative; width: 100%; max-width: 400px; height: 50vh; background: rgba(255,255,255,0.05); border-radius: 16px; overflow: hidden; margin: 10px 0; }
-    .game-star { position: absolute; font-size: 30px; cursor: pointer; user-select: none; transition: transform 0.2s; }
-    
+    .star-field { position: relative; width: 100%; max-width: 400px; height: 50vh; max-height: 400px; background: rgba(255,255,255,0.05); border-radius: 16px; overflow: hidden; border: 1px solid rgba(99,179,237,0.3); cursor: crosshair; touch-action: none; }
+    .game-star { position: absolute; font-size: 35px; cursor: pointer; transition: transform 0.2s, opacity 0.2s; filter: drop-shadow(0 0 8px #f6e05e); }
+
     /* Специфика Торта */
-    .candles-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 300px; margin-bottom: 10px; z-index: 2; }
-    .candle { width: 14px; height: 50px; background: repeating-linear-gradient(45deg, #fbb6ce 0, #fbb6ce 4px, #fff 4px, #fff 8px); border-radius: 3px; cursor: pointer; position: relative; }
-    .flame { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 12px; height: 18px; background: #f6e05e; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; box-shadow: 0 0 10px #f6e05e; animation: flicker 0.3s infinite alternate; pointer-events: none; }
-    @keyframes flicker { from { transform: translateX(-50%) scale(1); opacity: 1; } to { transform: translateX(-50%) scale(0.9); opacity: 0.8; } }
-    .cake-body { width: 250px; height: 100px; background: linear-gradient(180deg, #ed8936, #dd6b20); border-radius: 10px 10px 0 0; margin-top: -5px; z-index: 1; }
+    .candles-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 320px; margin-bottom: 0; z-index: 2; padding: 0 10px; }
+    .candle { width: 14px; height: 55px; background: repeating-linear-gradient(45deg, #fbb6ce 0, #fbb6ce 4px, #fff 4px, #fff 8px); border-radius: 3px; cursor: pointer; position: relative; box-shadow: inset -2px 0 3px rgba(0,0,0,0.15); }
+    .flame { position: absolute; top: -22px; left: 50%; transform: translateX(-50%); width: 14px; height: 20px; background: radial-gradient(ellipse at 50% 70%, #fff 0%, #f6e05e 35%, #ed8936 70%, transparent 100%); border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; box-shadow: 0 0 15px #f6e05e; animation: flicker 0.2s infinite alternate; pointer-events: none; }
+    @keyframes flicker { 0% { transform: translateX(-50%) scale(1); opacity: 1; } 100% { transform: translateX(-50%) scale(0.9) rotate(2deg); opacity: 0.8; } }
+    .cake-body { width: 280px; height: 120px; background: linear-gradient(180deg, #fbb6ce 0%, #f6ad55 40%, #ed8936 100%); border-radius: 16px 16px 8px 8px; margin-top: -5px; z-index: 1; box-shadow: 0 10px 20px rgba(0,0,0,0.3); position: relative; }
+    .cake-body::after { content: '🍒 🍒 🍒'; position: absolute; top: 15px; left: 0; right: 0; font-size: 20px; letter-spacing: 20px; }
 
     /* Специфика Магазина */
     .shop-list { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 400px; margin: 10px 0; }
-    .shop-item { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 12px; text-align: left; }
-    .shop-icon { font-size: 24px; }
-    .shop-info { flex: 1; }
-    .shop-name { font-weight: 700; font-size: 0.9rem; }
-    .shop-desc { font-size: 0.7rem; color: #a0aec0; }
-    .shop-buy { background: #e53e3e; color: white; border: none; padding: 6px 12px; border-radius: 20px; font-weight: 700; font-size: 0.8rem; }
-    .shop-buy:disabled { opacity: 0.5; background: #4a5568; }
-
-    @media (max-width: 480px) {
-      h1 { font-size: 1.9rem; }
-      .card { padding: 25px 15px; }
-    }
+    .shop-item { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.08); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); }
+    .shop-icon { font-size: 26px; }
+    .shop-info { flex: 1; text-align: left; }
+    .shop-name { font-weight: 700; font-size: 0.95rem; }
+    .shop-desc { font-size: 0.75rem; color: #a0aec0; }
+    .shop-buy { background: #e53e3e; color: white; border: none; padding: 8px 14px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; cursor: pointer; }
+    .shop-buy:disabled { opacity: 0.5; background: #4a5568; cursor: default; }
   </style>
 </head>
 <body>
-  <div class="bg-glow"></div>
-  <div class="bg-bokeh bokeh-1"></div>
-  <div class="bg-bokeh bokeh-2"></div>
+  <div class="bg-rotating-gradient"></div>
+  <div class="bg-bokeh"><div class="bokeh-1"></div><div class="bokeh-2"></div></div>
+  <div class="balloons-container" id="balloonsContainer"></div>
 
   <div class="candy-counter" id="candyCounter">
-    <span>🍬</span>
-    <span id="candyValue">0</span>
-    <button class="candy-shop-btn" id="candyShopBtn">🛒</button>
+    <span>🍬</span> <span id="candyValue">0</span>
+    <button class="candy-shop-btn" id="candyShopBtn" title="Магазин">🛒</button>
   </div>
 
   <main class="card" id="greetingCard">
@@ -181,31 +193,30 @@
       <button class="btn btn-shop" id="shopBtn">🛒 Магазин</button>
     </div>
 
-    <div class="wishes-wrap" id="wishesWrap">
+    <div class="wishes-wrapper" id="wishesWrap">
       <ul class="wishes-list">
         <li>Пусть каждый твой проект взлетает выше, чем ты планировала.</li>
         <li>Пусть рядом будут только те, с кем можно смеяться до слёз.</li>
         <li>Пусть твоя внутренняя батарейка никогда не садится.</li>
         <li>Помни: что бы ни случилось, у тебя есть я. Всегда.</li>
       </ul>
-      
       <div class="wish-box">
         <div class="wish-input-group">
           <input type="text" class="wish-input" id="wishInput" placeholder="Загадай желание...">
-          <button class="wish-btn" id="wishSend">🎈</button>
+          <button class="wish-send" id="wishSend">🎈</button>
         </div>
       </div>
     </div>
   </main>
 
   <script>
-    // Глобальный перехватчик, чтобы игры не ломали карточку
+    // Глобальный щит от ошибок
     window.addEventListener('error', function(e) { console.error('Ошибка:', e.message); });
 
-    // ============================================================
-    //  БЛОК 1: Основной интерфейс, конфеты, магазин, желания
-    // ============================================================
-    try {
+    (function() {
+      'use strict';
+
+      /* ========== 1. БАЗОВЫЕ ЭЛЕМЕНТЫ И КОНФЕТЫ ========== */
       var candyCount = parseInt(localStorage.getItem('sonya_candies') || '0', 10);
       var candyEl = document.getElementById('candyValue');
       var candyCont = document.getElementById('candyCounter');
@@ -213,13 +224,46 @@
       function updateCandyUI() {
         if (candyEl) candyEl.textContent = candyCount;
         if (candyCont) {
-          candyCont.style.transform = 'scale(1.2)';
-          setTimeout(function() { candyCont.style.transform = 'scale(1)'; }, 200);
+          candyCont.classList.remove('bump');
+          void candyCont.offsetWidth;
+          candyCont.classList.add('bump');
+          setTimeout(function() { candyCont.classList.remove('bump'); }, 300);
         }
       }
       updateCandyUI();
 
-      // Кнопка пожеланий
+      /* ========== 2. ШАРЫ НА ФОНЕ ========== */
+      var colors = ['#e53e3e','#ed8936','#ecc94b','#48bb78','#4299e1','#9f7aea','#ed64a6'];
+      var bCont = document.getElementById('balloonsContainer');
+      function makeBalloon() {
+        if (!bCont) return;
+        var b = document.createElement('div');
+        b.className = 'balloon';
+        b.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        b.style.left = Math.random() * 100 + '%';
+        var scale = 0.6 + Math.random() * 0.6;
+        b.style.width = (50 * scale) + 'px';
+        b.style.height = (65 * scale) + 'px';
+        var dur = 12 + Math.random() * 10;
+        b.style.animationDuration = dur + 's';
+        b.style.animationDelay = (Math.random() * 5) + 's';
+        bCont.appendChild(b);
+        setTimeout(function() { if (b.parentNode) b.remove(); }, (dur + 6) * 1000);
+      }
+      for (var i=0; i<10; i++) makeBalloon();
+      setInterval(function() { if (bCont.children.length < 15) makeBalloon(); }, 2500);
+
+      /* ========== 3. БЛИК НА КАРТОЧКЕ ========== */
+      var card = document.getElementById('greetingCard');
+      if (card) {
+        card.addEventListener('mousemove', function(e) {
+          var r = card.getBoundingClientRect();
+          card.style.setProperty('--mouse-x', ((e.clientX - r.left) / r.width * 100) + '%');
+          card.style.setProperty('--mouse-y', ((e.clientY - r.top) / r.height * 100) + '%');
+        });
+      }
+
+      /* ========== 4. ПОЖЕЛАНИЯ ========== */
       var toggleBtn = document.getElementById('toggleBtn');
       var wishesWrap = document.getElementById('wishesWrap');
       var isOpen = false;
@@ -240,10 +284,10 @@
         });
       }
 
-      // Отправка желания
+      /* ========== 5. ВВОД ЖЕЛАНИЯ ========== */
       var wishSend = document.getElementById('wishSend');
       var wishInput = document.getElementById('wishInput');
-      if (wishSend && wishInput) {
+      if (wishSend) {
         wishSend.addEventListener('click', function() {
           if (wishInput.value.trim()) {
             wishInput.value = '';
@@ -253,13 +297,43 @@
         });
       }
 
-      // Глобальный оверлей для игр
+      /* ========== 6. ПАДАЮЩИЕ ЗВЕЗДЫ ========== */
       var activeOverlay = null;
-      function openOverlay(titleText, bgColor) {
+      function spawnStar() {
         if (activeOverlay) return;
+        if (Math.random() > 0.4) return; 
+
+        var s = document.createElement('div');
+        s.className = 'falling-star';
+        s.textContent = Math.random() > 0.5 ? '⭐' : '🌟';
+        s.style.left = Math.random() * 100 + 'vw';
+        s.style.top = '-60px';
+        s.style.setProperty('--drift', ((Math.random() - 0.5) * 200) + 'px');
+        s.style.animationDuration = (5 + Math.random() * 3) + 's';
+        s.style.fontSize = (24 + Math.random() * 10) + 'px';
+
+        s.onclick = function() {
+          if (s.dataset.caught) return;
+          s.dataset.caught = '1';
+          candyCount++;
+          localStorage.setItem('sonya_candies', candyCount);
+          updateCandyUI();
+          s.style.transform = 'scale(2)';
+          s.style.opacity = '0';
+          setTimeout(function() { s.remove(); }, 200);
+        };
+
+        document.body.appendChild(s);
+        setTimeout(function() { if(s.parentNode && !s.dataset.caught) s.remove(); }, 8000);
+      }
+      setInterval(spawnStar, 4000);
+
+      /* ========== 7. ОВЕРЛЕЙ (БАЗА) ========== */
+      function openOverlay(titleText, bgColor) {
+        if (activeOverlay) return null;
         activeOverlay = document.createElement('div');
         activeOverlay.className = 'overlay';
-        activeOverlay.style.background = bgColor || '#1a202c';
+        if (bgColor) activeOverlay.style.background = bgColor;
         
         var h2 = document.createElement('h2');
         h2.textContent = titleText;
@@ -267,7 +341,7 @@
 
         var back = document.createElement('button');
         back.className = 'back-btn';
-        back.textContent = '← Назад к открытке';
+        back.textContent = '← Вернуться к открытке';
         back.onclick = function() {
           activeOverlay.remove();
           activeOverlay = null;
@@ -278,15 +352,13 @@
         return activeOverlay;
       }
 
-      // ============================================================
-      //  ИГРА 1: ЗМЕЙКА
-      // ============================================================
+      /* ========== 8. ИГРА: ЗМЕЙКА ========== */
       document.getElementById('auraBtn').addEventListener('click', function() {
-        if (activeOverlay) return;
         var ov = openOverlay('🐍 Змейка и торты');
+        if (!ov) return;
         
         var scoreEl = document.createElement('div');
-        scoreEl.className = 'overlay-score';
+        scoreEl.className = 'score-board';
         scoreEl.textContent = 'Тортов: 0';
         ov.insertBefore(scoreEl, ov.lastChild);
 
@@ -294,11 +366,7 @@
         var size = Math.min(window.innerWidth - 40, window.innerHeight - 280, 360);
         var GRID = 15;
         var CELL = Math.floor(size / GRID);
-        cvs.width = CELL * GRID;
-        cvs.height = CELL * GRID;
-        cvs.style.background = '#2d3748';
-        cvs.style.borderRadius = '12px';
-        cvs.style.touchAction = 'none';
+        cvs.width = CELL * GRID; cvs.height = CELL * GRID;
         ov.insertBefore(cvs, ov.lastChild);
         var ctx = cvs.getContext('2d');
 
@@ -355,13 +423,13 @@
           ctx.fillStyle = '#e53e3e'; ctx.font = 'bold 20px sans-serif';
           ctx.textAlign = 'center'; ctx.fillText('Игра окончена!', cvs.width/2, cvs.height/2 - 10);
           ctx.fillStyle = '#f6e05e'; ctx.font = '14px sans-serif';
-          ctx.fillText('Нажми ↑ чтобы начать заново', cvs.width/2, cvs.height/2 + 20);
+          ctx.fillText('Нажми ↑ чтобы начать', cvs.width/2, cvs.height/2 + 20);
           isStarted = false; dir = {x:0,y:0}; nextDir = {x:0,y:0};
           snake = [{x:5,y:5}]; score = 0; speed = 280;
         }
 
         function draw() {
-          ctx.fillStyle = '#2d3748'; ctx.fillRect(0,0,cvs.width,cvs.height);
+          ctx.fillStyle = '#1a202c'; ctx.fillRect(0,0,cvs.width,cvs.height);
           ctx.font = (CELL-2)+'px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
           ctx.fillText('🎂', food.x*CELL + CELL/2, food.y*CELL + CELL/2);
           for (var i=0; i<snake.length; i++) {
@@ -389,16 +457,14 @@
         reset();
       });
 
-      // ============================================================
-      //  ИГРА 2: ПОЙМАЙ ЗВЕЗДУ
-      // ============================================================
+      /* ========== 9. ИГРА: ЗВЕЗДА ========== */
       document.getElementById('starBtn').addEventListener('click', function() {
-        if (activeOverlay) return;
-        var ov = openOverlay('⭐ Поймай звезду', '#1a202c');
+        var ov = openOverlay('⭐ Поймай звезду');
+        if (!ov) return;
         
         var score = 0, time = 15, playing = false;
         var scoreDisplay = document.createElement('div');
-        scoreDisplay.className = 'overlay-score';
+        scoreDisplay.className = 'score-board';
         scoreDisplay.textContent = 'Счёт: 0 | Время: 15с';
         ov.insertBefore(scoreDisplay, ov.lastChild);
 
@@ -424,40 +490,37 @@
             var s = document.createElement('div');
             s.className = 'game-star';
             s.textContent = '⭐';
-            s.style.left = Math.random() * 80 + '%';
-            s.style.top = Math.random() * 80 + '%';
+            s.style.left = Math.random() * 80 + 10 + '%';
+            s.style.top = Math.random() * 80 + 10 + '%';
             s.onclick = function() {
               if (!playing) return;
               score++; scoreDisplay.textContent = 'Счёт: ' + score + ' | Время: ' + time + 'с';
-              s.remove();
+              s.style.transform = 'scale(1.5)'; s.style.opacity = '0';
+              setTimeout(function() { s.remove(); }, 200);
             };
             field.appendChild(s);
-            setTimeout(function() { if (s.parentNode) s.remove(); }, 1500);
+            setTimeout(function() { if (s.parentNode && s.style.opacity !== '0') s.remove(); }, 1500);
           }, 600);
         }
 
         function end() {
           playing = false;
           clearInterval(timer); clearInterval(spawner);
-          field.innerHTML = '<div style="display:flex;height:100%;align-items:center;justify-content:center;flex-direction:column;color:#f6e05e;"><h3>Время вышло!</h3><p>Твой счёт: ' + score + '</p><button onclick="this.parentNode.parentNode.innerHTML=\'\'" style="margin-top:10px;padding:8px 16px;border-radius:20px;border:none;background:#e53e3e;color:white;font-weight:bold;">Ещё раз</button></div>';
-          // Перезапуск через клик по кнопке (упрощенно)
-          var btn = field.querySelector('button');
-          if (btn) btn.onclick = function() { start(); };
+          field.innerHTML = '<div style="display:flex;height:100%;align-items:center;justify-content:center;flex-direction:column;color:#f6e05e;"><h3>Время вышло!</h3><p>Твой счёт: ' + score + '</p><button id="rstBtn" style="margin-top:10px;padding:8px 16px;border-radius:20px;border:none;background:#e53e3e;color:white;font-weight:bold;cursor:pointer;">Ещё раз</button></div>';
+          field.querySelector('#rstBtn').onclick = start;
         }
 
         start();
       });
 
-      // ============================================================
-      //  ИГРА 3: ЗАДУЙ СВЕЧИ
-      // ============================================================
+      /* ========== 10. ИГРА: ТОРТ ========== */
       document.getElementById('cakeBtn').addEventListener('click', function() {
-        if (activeOverlay) return;
         var ov = openOverlay('🎂 Задуй 16 свечей', '#2a1f3d');
+        if (!ov) return;
         
         var total = 16, blown = 0;
         var counter = document.createElement('div');
-        counter.className = 'overlay-score';
+        counter.className = 'score-board';
         counter.textContent = 'Осталось: 16';
         ov.insertBefore(counter, ov.lastChild);
 
@@ -498,16 +561,15 @@
         ov.insertBefore(scene, ov.lastChild);
       });
 
-      // ============================================================
-      //  ИГРА 4: МАГАЗИН
-      // ============================================================
+      /* ========== 11. МАГАЗИН ========== */
       function openShop() {
-        if (activeOverlay) return;
-        var ov = openOverlay('🛒 Магазин конфет', '#1a202c');
+        var ov = openOverlay('🛒 Магазин конфет');
+        if (!ov) return;
         
         var items = [
           { id: 'dbl', name: 'Двойные конфеты', desc: '×2 конфеты за звезду', price: 30 },
-          { id: 'boost', name: 'Звёздный дождь', desc: 'Больше звёзд на экране', price: 50 }
+          { id: 'boost', name: 'Звёздный дождь', desc: 'Больше звёзд на экране', price: 50 },
+          { id: 'gold', name: 'Золотая звезда', desc: 'Редкая звезда (+5 конфет)', price: 80 }
         ];
 
         var list = document.createElement('div');
@@ -521,7 +583,7 @@
             div.className = 'shop-item';
             div.innerHTML = '<div class="shop-icon">✨</div>' +
               '<div class="shop-info"><div class="shop-name">' + it.name + '</div><div class="shop-desc">' + it.desc + '</div></div>' +
-              '<button class="shop-buy">' + (owned ? '✓' : '🍬 ' + it.price) + '</button>';
+              '<button class="shop-buy">' + (owned ? '✓ Куплено' : '🍬 ' + it.price) + '</button>';
             
             var btn = div.querySelector('button');
             if (owned) btn.disabled = true;
@@ -533,7 +595,7 @@
                   localStorage.setItem('shop_' + it.id, '1');
                   updateCandyUI(); render();
                 } else {
-                  alert('Не хватает конфет!');
+                  alert('Не хватает конфет! Лови звёзды!');
                 }
               };
             }
@@ -546,49 +608,7 @@
       document.getElementById('shopBtn').addEventListener('click', openShop);
       document.getElementById('candyShopBtn').addEventListener('click', openShop);
 
-      // ============================================================
-      //  ПАДАЮЩИЕ ЗВЁЗДЫ НА ГЛАВНОМ ЭКРАНЕ
-      // ============================================================
-      function spawnStar() {
-        if (activeOverlay) return;
-        if (Math.random() > 0.3) return; // не спавним каждую секунду
-
-        var s = document.createElement('div');
-        s.textContent = '⭐';
-        s.style.position = 'fixed';
-        s.style.left = Math.random() * 100 + 'vw';
-        s.style.top = '-40px';
-        s.style.fontSize = '24px';
-        s.style.cursor = 'pointer';
-        s.style.zIndex = '50';
-        s.style.transition = 'transform 4s linear, top 4s linear, opacity 4s';
-        s.style.filter = 'drop-shadow(0 0 10px #f6e05e)';
-        document.body.appendChild(s);
-
-        // Анимация падения
-        requestAnimationFrame(function() {
-          s.style.top = '110vh';
-          s.style.transform = 'rotate(360deg)';
-        });
-
-        s.onclick = function() {
-          if (s.dataset.caught) return;
-          s.dataset.caught = '1';
-          candyCount++;
-          localStorage.setItem('sonya_candies', candyCount);
-          updateCandyUI();
-          s.style.transform = 'scale(2)';
-          s.style.opacity = '0';
-          setTimeout(function() { s.remove(); }, 200);
-        };
-
-        setTimeout(function() { if(s.parentNode && !s.dataset.caught) s.remove(); }, 4000);
-      }
-      setInterval(spawnStar, 3000);
-
-    } catch (err) {
-      console.error('Ошибка в основном скрипте:', err);
-    }
+    })();
   </script>
 </body>
 </html>
