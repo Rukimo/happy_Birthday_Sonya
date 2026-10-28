@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Соня, с 16-летием! 🎂</title>
+  <style>
+    :root {
+      --bg: #f8f9fa;
+      --text: #2d3748;
+      --accent: #e53e3e;
+      --accent-soft: rgba(229, 62, 62, 0.15);
+      --secondary: #718096;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --gold: #d69e2e;
+      --ease: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
+      line-height: 1.6;
+      padding: 15px;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Красивый фон */
+    .bg-glow {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background: radial-gradient(circle at 50% 50%, rgba(229, 62, 62, 0.05) 0%, transparent 60%);
+    }
+    .bg-bokeh {
+      position: fixed; border-radius: 50%; filter: blur(80px); pointer-events: none; z-index: 0;
+    }
+    .bokeh-1 { width: 300px; height: 300px; background: #fff; top: 0; left: 0; opacity: 0.8; }
+    .bokeh-2 { width: 400px; height: 400px; background: var(--accent-soft); bottom: 0; right: 0; }
+
+    /* Счётчик конфет */
+    .candy-counter {
+      position: fixed; top: 15px; right: 15px; z-index: 100;
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 12px; background: rgba(255, 255, 255, 0.95);
+      border-radius: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      font-weight: 700; font-size: 0.9rem;
+    }
+    .candy-shop-btn {
+      background: var(--accent); color: white; border: none;
+      width: 26px; height: 26px; border-radius: 50%; font-size: 0.8rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* Карточка */
+    .card {
+      position: relative; z-index: 10; width: 100%; max-width: 400px;
+      background: var(--card-bg); border-radius: 24px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.08), inset 0 0 0 1px var(--border);
+      padding: 30px 20px; text-align: center;
+      transition: transform 0.4s var(--ease);
+    }
+
+    h1 { font-size: 2.2rem; font-weight: 800; line-height: 1.15; margin-bottom: 5px; }
+    .name-highlight { color: var(--accent); }
+    
+    .age-badge {
+      display: inline-block; background: linear-gradient(135deg, var(--gold), #f6e05e);
+      color: #744210; font-weight: 700; font-size: 0.8rem;
+      padding: 4px 14px; border-radius: 20px; margin: 5px 0 15px;
+    }
+    
+    .subtitle { font-size: 0.95rem; color: var(--secondary); margin-bottom: 20px; }
+
+    /* Кнопки */
+    .btn-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
+    .btn {
+      width: 100%; padding: 12px; border-radius: 30px; font-size: 0.95rem;
+      font-weight: 700; border: 2px solid transparent; display: flex;
+      align-items: center; justify-content: center; gap: 8px;
+      transition: transform 0.2s, box-shadow 0.2s; outline: none;
+    }
+    .btn:active { transform: scale(0.97); }
+    
+    .btn-primary { background: transparent; border-color: var(--accent); color: var(--accent); }
+    .btn-aura { background: linear-gradient(135deg, #805ad5, #d53f8c); color: white; }
+    .btn-star { background: linear-gradient(135deg, #3182ce, #63b3ed); color: white; }
+    .btn-cake { background: linear-gradient(135deg, #ed8936, #f6e05e); color: white; }
+    .btn-shop { background: linear-gradient(135deg, #9f7aea, #ed64a6); color: white; }
+
+    /* Скрытый блок пожеланий */
+    .wishes-wrap {
+      max-height: 0; overflow: hidden; opacity: 0;
+      transition: max-height 0.5s ease, opacity 0.4s ease;
+      text-align: left;
+    }
+    .wishes-wrap.open { max-height: 800px; opacity: 1; margin-top: 15px; }
+    .wishes-list { list-style: none; font-size: 0.9rem; margin-bottom: 20px; }
+    .wishes-list li { margin-bottom: 10px; padding-left: 20px; position: relative; }
+    .wishes-list li::before { content: '✦'; color: var(--accent); position: absolute; left: 0; }
+
+    /* Ввод желания */
+    .wish-box { background: #f7fafc; padding: 12px; border-radius: 16px; border: 1px dashed var(--accent); }
+    .wish-input-group { display: flex; gap: 5px; }
+    .wish-input { flex: 1; padding: 8px 12px; border: 1px solid var(--border); border-radius: 20px; font-size: 0.85rem; outline: none; }
+    .wish-btn { background: var(--accent); color: white; border: none; border-radius: 20px; padding: 0 15px; font-weight: 600; }
+
+    /* Оверлеи (игры) */
+    .overlay {
+      position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 10px; padding: 15px;
+      background: #1a202c; color: white; font-family: inherit; overflow-y: auto;
+    }
+    .overlay h2 { font-size: 1.2rem; text-align: center; color: #f6e05e; margin-bottom: 5px; }
+    .overlay-score { font-weight: 700; color: #f6e05e; }
+    
+    .back-btn {
+      margin-top: 10px; background: transparent; border: 2px solid #e53e3e;
+      color: #e53e3e; padding: 10px 20px; border-radius: 30px; font-weight: 600;
+    }
+
+    /* Специфика Змейки */
+    .dpad { display: grid; grid-template-columns: repeat(3, 50px); grid-template-rows: repeat(3, 50px); gap: 5px; margin-top: 5px; }
+    .dpad button { background: rgba(255,255,255,0.1); border: 2px solid #4a5568; color: #f6e05e; font-size: 20px; border-radius: 10px; }
+    .dpad .empty { visibility: hidden; }
+    
+    /* Специфика Звезды */
+    .star-field { position: relative; width: 100%; max-width: 400px; height: 50vh; background: rgba(255,255,255,0.05); border-radius: 16px; overflow: hidden; margin: 10px 0; }
+    .game-star { position: absolute; font-size: 30px; cursor: pointer; user-select: none; transition: transform 0.2s; }
+    
+    /* Специфика Торта */
+    .candles-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 300px; margin-bottom: 10px; z-index: 2; }
+    .candle { width: 14px; height: 50px; background: repeating-linear-gradient(45deg, #fbb6ce 0, #fbb6ce 4px, #fff 4px, #fff 8px); border-radius: 3px; cursor: pointer; position: relative; }
+    .flame { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 12px; height: 18px; background: #f6e05e; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; box-shadow: 0 0 10px #f6e05e; animation: flicker 0.3s infinite alternate; pointer-events: none; }
+    @keyframes flicker { from { transform: translateX(-50%) scale(1); opacity: 1; } to { transform: translateX(-50%) scale(0.9); opacity: 0.8; } }
+    .cake-body { width: 250px; height: 100px; background: linear-gradient(180deg, #ed8936, #dd6b20); border-radius: 10px 10px 0 0; margin-top: -5px; z-index: 1; }
+
+    /* Специфика Магазина */
+    .shop-list { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 400px; margin: 10px 0; }
+    .shop-item { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 12px; text-align: left; }
+    .shop-icon { font-size: 24px; }
+    .shop-info { flex: 1; }
+    .shop-name { font-weight: 700; font-size: 0.9rem; }
+    .shop-desc { font-size: 0.7rem; color: #a0aec0; }
+    .shop-buy { background: #e53e3e; color: white; border: none; padding: 6px 12px; border-radius: 20px; font-weight: 700; font-size: 0.8rem; }
+    .shop-buy:disabled { opacity: 0.5; background: #4a5568; }
+
+    @media (max-width: 480px) {
+      h1 { font-size: 1.9rem; }
+      .card { padding: 25px 15px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-glow"></div>
+  <div class="bg-bokeh bokeh-1"></div>
+  <div class="bg-bokeh bokeh-2"></div>
+
+  <div class="candy-counter" id="candyCounter">
+    <span>🍬</span>
+    <span id="candyValue">0</span>
+    <button class="candy-shop-btn" id="candyShopBtn">🛒</button>
+  </div>
+
+  <main class="card" id="greetingCard">
+    <h1>Соня, с <span class="name-highlight">16-летием</span>!</h1>
+    <div class="age-badge">🎂 16 лет 🎉</div>
+    <p class="subtitle">Просто так, без повода. Чтобы твой день стал теплее</p>
+
+    <div class="btn-group">
+      <button class="btn btn-primary" id="toggleBtn">Открыть пожелание ✨</button>
+      <button class="btn btn-aura" id="auraBtn">⚡ Нафармить ауру</button>
+      <button class="btn btn-star" id="starBtn">⭐ Поймай звезду</button>
+      <button class="btn btn-cake" id="cakeBtn">🎂 Задуй свечи</button>
+      <button class="btn btn-shop" id="shopBtn">🛒 Магазин</button>
+    </div>
+
+    <div class="wishes-wrap" id="wishesWrap">
+      <ul class="wishes-list">
+        <li>Пусть каждый твой проект взлетает выше, чем ты планировала.</li>
+        <li>Пусть рядом будут только те, с кем можно смеяться до слёз.</li>
+        <li>Пусть твоя внутренняя батарейка никогда не садится.</li>
+        <li>Помни: что бы ни случилось, у тебя есть я. Всегда.</li>
+      </ul>
+      
+      <div class="wish-box">
+        <div class="wish-input-group">
+          <input type="text" class="wish-input" id="wishInput" placeholder="Загадай желание...">
+          <button class="wish-btn" id="wishSend">🎈</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Глобальный перехватчик, чтобы игры не ломали карточку
+    window.addEventListener('error', function(e) { console.error('Ошибка:', e.message); });
+
+    // ============================================================
+    //  БЛОК 1: Основной интерфейс, конфеты, магазин, желания
+    // ============================================================
+    try {
+      var candyCount = parseInt(localStorage.getItem('sonya_candies') || '0', 10);
+      var candyEl = document.getElementById('candyValue');
+      var candyCont = document.getElementById('candyCounter');
+      
+      function updateCandyUI() {
+        if (candyEl) candyEl.textContent = candyCount;
+        if (candyCont) {
+          candyCont.style.transform = 'scale(1.2)';
+          setTimeout(function() { candyCont.style.transform = 'scale(1)'; }, 200);
+        }
+      }
+      updateCandyUI();
+
+      // Кнопка пожеланий
+      var toggleBtn = document.getElementById('toggleBtn');
+      var wishesWrap = document.getElementById('wishesWrap');
+      var isOpen = false;
+      if (toggleBtn) {
+        toggleBtn.addEventListener('click', function() {
+          isOpen = !isOpen;
+          if (isOpen) {
+            wishesWrap.classList.add('open');
+            toggleBtn.textContent = 'Свернуть ✨';
+            toggleBtn.style.background = 'var(--accent)';
+            toggleBtn.style.color = 'white';
+          } else {
+            wishesWrap.classList.remove('open');
+            toggleBtn.textContent = 'Открыть пожелание ✨';
+            toggleBtn.style.background = 'transparent';
+            toggleBtn.style.color = 'var(--accent)';
+          }
+        });
+      }
+
+      // Отправка желания
+      var wishSend = document.getElementById('wishSend');
+      var wishInput = document.getElementById('wishInput');
+      if (wishSend && wishInput) {
+        wishSend.addEventListener('click', function() {
+          if (wishInput.value.trim()) {
+            wishInput.value = '';
+            wishSend.textContent = '✨';
+            setTimeout(function() { wishSend.textContent = '🎈'; }, 2000);
+          }
+        });
+      }
+
+      // Глобальный оверлей для игр
+      var activeOverlay = null;
+      function openOverlay(titleText, bgColor) {
+        if (activeOverlay) return;
+        activeOverlay = document.createElement('div');
+        activeOverlay.className = 'overlay';
+        activeOverlay.style.background = bgColor || '#1a202c';
+        
+        var h2 = document.createElement('h2');
+        h2.textContent = titleText;
+        activeOverlay.appendChild(h2);
+
+        var back = document.createElement('button');
+        back.className = 'back-btn';
+        back.textContent = '← Назад к открытке';
+        back.onclick = function() {
+          activeOverlay.remove();
+          activeOverlay = null;
+        };
+        activeOverlay.appendChild(back);
+        
+        document.body.appendChild(activeOverlay);
+        return activeOverlay;
+      }
+
+      // ============================================================
+      //  ИГРА 1: ЗМЕЙКА
+      // ============================================================
+      document.getElementById('auraBtn').addEventListener('click', function() {
+        if (activeOverlay) return;
+        var ov = openOverlay('🐍 Змейка и торты');
+        
+        var scoreEl = document.createElement('div');
+        scoreEl.className = 'overlay-score';
+        scoreEl.textContent = 'Тортов: 0';
+        ov.insertBefore(scoreEl, ov.lastChild);
+
+        var cvs = document.createElement('canvas');
+        var size = Math.min(window.innerWidth - 40, window.innerHeight - 280, 360);
+        var GRID = 15;
+        var CELL = Math.floor(size / GRID);
+        cvs.width = CELL * GRID;
+        cvs.height = CELL * GRID;
+        cvs.style.background = '#2d3748';
+        cvs.style.borderRadius = '12px';
+        cvs.style.touchAction = 'none';
+        ov.insertBefore(cvs, ov.lastChild);
+        var ctx = cvs.getContext('2d');
+
+        var dpad = document.createElement('div');
+        dpad.className = 'dpad';
+        ['empty','up','empty','left','empty','right','empty','down','empty'].forEach(function(d) {
+          var b = document.createElement('button');
+          if (d === 'empty') b.className = 'empty';
+          else {
+            b.dataset.dir = d;
+            b.textContent = d === 'up'?'↑':d === 'down'?'↓':d === 'left'?'←':'→';
+            b.onclick = function() { setDir(d); };
+          }
+          dpad.appendChild(b);
+        });
+        ov.insertBefore(dpad, ov.lastChild);
+
+        var snake, dir, nextDir, food, score, loop, speed, isStarted;
+        
+        function reset() {
+          snake = [{x:5,y:5}]; dir = {x:0,y:0}; nextDir = {x:0,y:0};
+          score = 0; speed = 280; isStarted = false;
+          scoreEl.textContent = 'Тортов: 0';
+          food = {x:10, y:10};
+          if (loop) clearInterval(loop);
+          loop = setInterval(tick, speed);
+          draw();
+        }
+
+        function tick() {
+          if (!isStarted) {
+            if (nextDir.x === 0 && nextDir.y === 0) return;
+            dir = nextDir; isStarted = true;
+          } else if (nextDir.x !== 0 || nextDir.y !== 0) {
+            dir = nextDir;
+          }
+          var head = {x: snake[0].x + dir.x, y: snake[0].y + dir.y};
+          if (head.x < 0 || head.x >= GRID || head.y < 0 || head.y >= GRID) return end();
+          for (var i=0; i<snake.length-1; i++) {
+            if (snake[i].x === head.x && snake[i].y === head.y) return end();
+          }
+          snake.unshift(head);
+          if (head.x === food.x && head.y === food.y) {
+            score++; scoreEl.textContent = 'Тортов: ' + score;
+            food = {x: Math.floor(Math.random()*GRID), y: Math.floor(Math.random()*GRID)};
+            if (speed > 120) { speed -= 10; clearInterval(loop); loop = setInterval(tick, speed); }
+          } else { snake.pop(); }
+          draw();
+        }
+
+        function end() {
+          clearInterval(loop);
+          ctx.fillStyle = 'rgba(0,0,0,0.7)'; ctx.fillRect(0,0,cvs.width,cvs.height);
+          ctx.fillStyle = '#e53e3e'; ctx.font = 'bold 20px sans-serif';
+          ctx.textAlign = 'center'; ctx.fillText('Игра окончена!', cvs.width/2, cvs.height/2 - 10);
+          ctx.fillStyle = '#f6e05e'; ctx.font = '14px sans-serif';
+          ctx.fillText('Нажми ↑ чтобы начать заново', cvs.width/2, cvs.height/2 + 20);
+          isStarted = false; dir = {x:0,y:0}; nextDir = {x:0,y:0};
+          snake = [{x:5,y:5}]; score = 0; speed = 280;
+        }
+
+        function draw() {
+          ctx.fillStyle = '#2d3748'; ctx.fillRect(0,0,cvs.width,cvs.height);
+          ctx.font = (CELL-2)+'px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.fillText('🎂', food.x*CELL + CELL/2, food.y*CELL + CELL/2);
+          for (var i=0; i<snake.length; i++) {
+            ctx.fillStyle = i===0 ? '#f6e05e' : '#ed8936';
+            ctx.fillRect(snake[i].x*CELL+1, snake[i].y*CELL+1, CELL-2, CELL-2);
+          }
+        }
+
+        function setDir(d) {
+          if (d === 'up' && dir.y !== 1) nextDir = {x:0, y:-1};
+          if (d === 'down' && dir.y !== -1) nextDir = {x:0, y:1};
+          if (d === 'left' && dir.x !== 1) nextDir = {x:-1, y:0};
+          if (d === 'right' && dir.x !== -1) nextDir = {x:1, y:0};
+        }
+        
+        var tX, tY;
+        cvs.addEventListener('touchstart', function(e) { tX = e.touches[0].clientX; tY = e.touches[0].clientY; }, {passive:true});
+        cvs.addEventListener('touchend', function(e) {
+          var dx = e.changedTouches[0].clientX - tX;
+          var dy = e.changedTouches[0].clientY - tY;
+          if (Math.abs(dx) > Math.abs(dy)) setDir(dx > 0 ? 'right' : 'left');
+          else setDir(dy > 0 ? 'down' : 'up');
+        }, {passive:true});
+
+        reset();
+      });
+
+      // ============================================================
+      //  ИГРА 2: ПОЙМАЙ ЗВЕЗДУ
+      // ============================================================
+      document.getElementById('starBtn').addEventListener('click', function() {
+        if (activeOverlay) return;
+        var ov = openOverlay('⭐ Поймай звезду', '#1a202c');
+        
+        var score = 0, time = 15, playing = false;
+        var scoreDisplay = document.createElement('div');
+        scoreDisplay.className = 'overlay-score';
+        scoreDisplay.textContent = 'Счёт: 0 | Время: 15с';
+        ov.insertBefore(scoreDisplay, ov.lastChild);
+
+        var field = document.createElement('div');
+        field.className = 'star-field';
+        ov.insertBefore(field, ov.lastChild);
+
+        var timer, spawner;
+
+        function start() {
+          score = 0; time = 15; playing = true;
+          scoreDisplay.textContent = 'Счёт: ' + score + ' | Время: ' + time + 'с';
+          field.innerHTML = '';
+          
+          timer = setInterval(function() {
+            time--;
+            scoreDisplay.textContent = 'Счёт: ' + score + ' | Время: ' + time + 'с';
+            if (time <= 0) end();
+          }, 1000);
+
+          spawner = setInterval(function() {
+            if (!playing) return;
+            var s = document.createElement('div');
+            s.className = 'game-star';
+            s.textContent = '⭐';
+            s.style.left = Math.random() * 80 + '%';
+            s.style.top = Math.random() * 80 + '%';
+            s.onclick = function() {
+              if (!playing) return;
+              score++; scoreDisplay.textContent = 'Счёт: ' + score + ' | Время: ' + time + 'с';
+              s.remove();
+            };
+            field.appendChild(s);
+            setTimeout(function() { if (s.parentNode) s.remove(); }, 1500);
+          }, 600);
+        }
+
+        function end() {
+          playing = false;
+          clearInterval(timer); clearInterval(spawner);
+          field.innerHTML = '<div style="display:flex;height:100%;align-items:center;justify-content:center;flex-direction:column;color:#f6e05e;"><h3>Время вышло!</h3><p>Твой счёт: ' + score + '</p><button onclick="this.parentNode.parentNode.innerHTML=\'\'" style="margin-top:10px;padding:8px 16px;border-radius:20px;border:none;background:#e53e3e;color:white;font-weight:bold;">Ещё раз</button></div>';
+          // Перезапуск через клик по кнопке (упрощенно)
+          var btn = field.querySelector('button');
+          if (btn) btn.onclick = function() { start(); };
+        }
+
+        start();
+      });
+
+      // ============================================================
+      //  ИГРА 3: ЗАДУЙ СВЕЧИ
+      // ============================================================
+      document.getElementById('cakeBtn').addEventListener('click', function() {
+        if (activeOverlay) return;
+        var ov = openOverlay('🎂 Задуй 16 свечей', '#2a1f3d');
+        
+        var total = 16, blown = 0;
+        var counter = document.createElement('div');
+        counter.className = 'overlay-score';
+        counter.textContent = 'Осталось: 16';
+        ov.insertBefore(counter, ov.lastChild);
+
+        var scene = document.createElement('div');
+        scene.style.display = 'flex'; scene.style.flexDirection = 'column'; scene.style.alignItems = 'center';
+        
+        var row = document.createElement('div');
+        row.className = 'candles-row';
+        
+        for (var i=0; i<total; i++) {
+          (function() {
+            var c = document.createElement('div');
+            c.className = 'candle';
+            var f = document.createElement('div');
+            f.className = 'flame';
+            c.appendChild(f);
+            c.onclick = function() {
+              if (c.dataset.out) return;
+              c.dataset.out = '1';
+              f.style.display = 'none';
+              blown++;
+              counter.textContent = 'Осталось: ' + (total - blown);
+              if (blown === total) {
+                counter.textContent = '🎉 Ура! Загадывай желание!';
+                counter.style.color = '#f6e05e';
+                counter.style.fontSize = '1.2rem';
+              }
+            };
+            row.appendChild(c);
+          })();
+        }
+        
+        var cake = document.createElement('div');
+        cake.className = 'cake-body';
+        
+        scene.appendChild(row);
+        scene.appendChild(cake);
+        ov.insertBefore(scene, ov.lastChild);
+      });
+
+      // ============================================================
+      //  ИГРА 4: МАГАЗИН
+      // ============================================================
+      function openShop() {
+        if (activeOverlay) return;
+        var ov = openOverlay('🛒 Магазин конфет', '#1a202c');
+        
+        var items = [
+          { id: 'dbl', name: 'Двойные конфеты', desc: '×2 конфеты за звезду', price: 30 },
+          { id: 'boost', name: 'Звёздный дождь', desc: 'Больше звёзд на экране', price: 50 }
+        ];
+
+        var list = document.createElement('div');
+        list.className = 'shop-list';
+
+        function render() {
+          list.innerHTML = '';
+          items.forEach(function(it) {
+            var owned = localStorage.getItem('shop_' + it.id) === '1';
+            var div = document.createElement('div');
+            div.className = 'shop-item';
+            div.innerHTML = '<div class="shop-icon">✨</div>' +
+              '<div class="shop-info"><div class="shop-name">' + it.name + '</div><div class="shop-desc">' + it.desc + '</div></div>' +
+              '<button class="shop-buy">' + (owned ? '✓' : '🍬 ' + it.price) + '</button>';
+            
+            var btn = div.querySelector('button');
+            if (owned) btn.disabled = true;
+            else {
+              btn.onclick = function() {
+                if (candyCount >= it.price) {
+                  candyCount -= it.price;
+                  localStorage.setItem('sonya_candies', candyCount);
+                  localStorage.setItem('shop_' + it.id, '1');
+                  updateCandyUI(); render();
+                } else {
+                  alert('Не хватает конфет!');
+                }
+              };
+            }
+            list.appendChild(div);
+          });
+        }
+        render();
+        ov.insertBefore(list, ov.lastChild);
+      }
+      document.getElementById('shopBtn').addEventListener('click', openShop);
+      document.getElementById('candyShopBtn').addEventListener('click', openShop);
+
+      // ============================================================
+      //  ПАДАЮЩИЕ ЗВЁЗДЫ НА ГЛАВНОМ ЭКРАНЕ
+      // ============================================================
+      function spawnStar() {
+        if (activeOverlay) return;
+        if (Math.random() > 0.3) return; // не спавним каждую секунду
+
+        var s = document.createElement('div');
+        s.textContent = '⭐';
+        s.style.position = 'fixed';
+        s.style.left = Math.random() * 100 + 'vw';
+        s.style.top = '-40px';
+        s.style.fontSize = '24px';
+        s.style.cursor = 'pointer';
+        s.style.zIndex = '50';
+        s.style.transition = 'transform 4s linear, top 4s linear, opacity 4s';
+        s.style.filter = 'drop-shadow(0 0 10px #f6e05e)';
+        document.body.appendChild(s);
+
+        // Анимация падения
+        requestAnimationFrame(function() {
+          s.style.top = '110vh';
+          s.style.transform = 'rotate(360deg)';
+        });
+
+        s.onclick = function() {
+          if (s.dataset.caught) return;
+          s.dataset.caught = '1';
+          candyCount++;
+          localStorage.setItem('sonya_candies', candyCount);
+          updateCandyUI();
+          s.style.transform = 'scale(2)';
+          s.style.opacity = '0';
+          setTimeout(function() { s.remove(); }, 200);
+        };
+
+        setTimeout(function() { if(s.parentNode && !s.dataset.caught) s.remove(); }, 4000);
+      }
+      setInterval(spawnStar, 3000);
+
+    } catch (err) {
+      console.error('Ошибка в основном скрипте:', err);
+    }
+  </script>
+</body>
+</html>
